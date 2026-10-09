@@ -3491,7 +3491,11 @@ def range_unit_root_test(x, store=False, *, result_object: bool | None = None):
     The p-values are interpolated from
     Table 1 of Aparicio et al. (2006). If the computed statistic is
     outside the table of critical values, then a warning message is
-    generated.
+    generated. Above the largest sample size in the table the critical
+    values of that size are used, since the statistic converges to a
+    distribution free of nuisance parameters whose tails the table's
+    critical values already match (Aparicio et al., 2006, Theorem 1 and
+    Figure 2).
 
     Missing values are not handled.
 
@@ -3536,7 +3540,7 @@ def range_unit_root_test(x, store=False, *, result_object: bool | None = None):
     inter_crit = np.zeros((1, crit.shape[1]))
     for i in range(crit.shape[1]):
         f = interp1d(n, crit[:, i])
-        inter_crit[0, i] = f(nobs)
+        inter_crit[0, i] = f(min(nobs, n[-1]))
 
     # Calculate RUR stat
     xs = pd.Series(x)

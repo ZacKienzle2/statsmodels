@@ -1848,6 +1848,18 @@ class TestRUR:
         assert res.resstore is not None
         assert res.resstore.nobs == len(self.x)
 
+    def test_nobs_above_table(self):
+        rs = np.random.RandomState(8474768)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=InterpolationWarning)
+            largest = range_unit_root_test(
+                np.cumsum(rs.standard_normal(5000)), result_object=True
+            )
+            above = range_unit_root_test(
+                np.cumsum(rs.standard_normal(5001)), result_object=True
+            )
+        assert_equal(above.critical_values, largest.critical_values)
+
 
 def test_pandasacovf():
     s = Series(lrange(1, 11))
