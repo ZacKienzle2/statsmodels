@@ -613,9 +613,10 @@ def acovf(x, adjusted=False, demean=True, fft=True, missing="none", nlag=None):
     if fft:
         nobs = len(xo)
         n = _next_regular(2 * nobs + 1)
-        Frf = np.fft.fft(xo, n=n)
-        acov = np.fft.ifft(Frf * np.conjugate(Frf))[:nobs] / d[nobs - 1 :]
-        acov = acov.real
+        # The transform of real input is Hermitian, so rfft keeps only the
+        # n // 2 + 1 non-negative frequencies (numpy.fft.rfft).
+        Frf = np.fft.rfft(xo, n=n)
+        acov = np.fft.irfft(Frf.real**2 + Frf.imag**2, n=n)[:nobs] / d[nobs - 1 :]
     else:
         acov = np.correlate(xo, xo, "full")[n - 1 :] / d[n - 1 :]
 
